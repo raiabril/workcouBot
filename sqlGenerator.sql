@@ -1,3 +1,4 @@
+CREATE DATABASE workcouBot;
 CREATE TABLE workcouBot.messagesLog (
 	id INT NOT NULL,
 	`date` INT NOT NULL,
