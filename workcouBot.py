@@ -8,12 +8,12 @@ import yaml
 import mysql.connector
 
 SESSION_ID = random.randint(0,1000000)
-TOKEN = os.getenv('BOT_TOKEN',"784190639:AAEFGEHszyKPRhgNUD4vzs9FeqjvHxx1n2U")
+TOKEN = os.getenv('BOT_TOKEN',"Starting now!")
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
-keyboard_wait = ["Entro","Salgo"]
+keyboard_wait = ["Starting now!","Out!"]
 
 def getDB(query):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
     cursor = cnx.cursor()
     query = ("SELECT * from messagesLog")
     cursor.execute(query)
@@ -69,27 +69,49 @@ def handle_updates(updates):
     for update in updates["result"]:
         try:
             id = update["message"]["message_id"]
-            first_name = update["message"]["from"]["first_name"]
-            last_name = update["message"]["from"]["last_name"]
-            username = update["message"]["from"]["username"]
-            is_bot = update["message"]["from"]["is_bot"]
             text = update["message"]["text"]
             chat = update["message"]["chat"]["id"]
             date = update["message"]["date"]
+        except Exception as e:
+            print(e)
+        try:
+            first_name = update["message"]["from"]["first_name"]
+        except Exception as e:
+            print(e)
+            first_name = "NULL"
+        try:
+            last_name = update["message"]["from"]["last_name"]
+        except Exception as e:
+            print(e)
+            last_name = "NULL"
+        try:
+            username = update["message"]["from"]["username"]
+        except Exception as e:
+            print(e)
+            username = "NULL"
+
+        try:
+            if text == keyboard_wait[0]:
+                keyboard = build_keyboard(keyboard_wait)
+                send_message("Good morning {}! Go get them!".format(username), chat,keyboard)
+
+            if text == keyboard_wait[1]:
+                keyboard = build_keyboard(keyboard_wait)
+                send_message("Great! Time to chill!", chat,keyboard)
+
+            if text == '/start':
+                keyboard = build_keyboard(keyboard_wait)
+                send_message("Hi! I'm a Bot designed to help you control your working or studying hours. Keep track of the time you spend in the office by sending me In! or Out!", chat,keyboard)
 
         except Exception as e:
-            print(e)
-        try:
-            if text == 'Entro':
+            if text != '':
                 keyboard = build_keyboard(keyboard_wait)
-                send_message("Recibido {}! A por ellos!".format(username), chat,keyboard)
-            if text == 'Salgo':
-                keyboard = build_keyboard(keyboard_wait)
-                send_message("Recibido {}! A descansar!".format(username), chat,keyboard)
-        except Exception as e:
+                send_message("Ups! I did not understand", chat,keyboard)
             print(e)
+            print(text)
         try:
             setMessageDB(id, date, chat, username, text)
+
         except Exception as e:
             print(e)
 
