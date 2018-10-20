@@ -39,7 +39,7 @@ def insertMessage(id, date, chat_id, username, text):
     cnx.close()
 
 def runQuery(query):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
     cursor = cnx.cursor()
     cursor.execute(query)
     data = cursor.fetchall()
