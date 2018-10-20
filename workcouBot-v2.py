@@ -16,11 +16,11 @@ import telegram
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def insertLog(date, update):
+def insertLog(update):
     cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
     cursor = cnx.cursor()
-    sql = "INSERT INTO logs (creation_epoch, log_text) VALUES (%s, %s)"
-    val = (date, update)
+    sql = "INSERT INTO logs (creation_datetime, log_text) VALUES (%s, %s)"
+    val = (str(datetime.now()), update)
     cursor.execute(sql, val)
     cnx.commit()
     print("{} - Log inserted".format(str(datetime.now())))
@@ -83,49 +83,55 @@ reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
 
 # ==========
 def start(bot, update):
-    insertLog(time.time(), str(update))
+    insertLog(str(update))
     bot.send_message(chat_id=update.message.chat_id, text="Hi! I'm a Bot designed to help you control \
     your working or studying hours. Keep track of the time you spend in the office by sending me Begin or Finish. \
     You can download your data whenever you want by sending My data!.\
-    For more info /help")
+    For more info /help", reply_markup=reply_markup)
 
 def help(bot, update):
-    insertLog(time.time(), str(update))
+    insertLog(str(update))
     bot.send_message(chat_id=update.message.chat_id,
-    text="This bot does not analyze or share your personal data.")
+    text="This bot does not analyze or share your personal data.", reply_markup=reply_markup)
 
 def unknown(bot, update):
-    insertLog(time.time(), str(update))
-    bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.")
+    insertLog(str(update))
+    bot.send_message(chat_id=update.message.chat_id, text="Sorry, I didn't understand that command.", reply_markup=reply_markup)
 
 def error(bot, update, error):
-    insertLog(time.time(), str(update))
+    insertLog(str(update))
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 def message_handler(bot, update):
-    insertLog(time.time(), str(update))
+    insertLog(str(update))
 
     id = update.message.message_id
     chat_id = update.message.chat_id
     text = update.message.text
     date = update.message.date
-    last_name = update.message.from_user.last_name
-    last_name = update.message.from_user.first_name
+    #last_name = update.message.from_user.last_name
+    #first_name = update.message.from_user.first_name
     username= update.message.from_user.username
 
     insertMessage(id, date, chat_id, username, text)
 
-    if text == "Begin":
-        bot.send_message(chat_id=update.message.chat_id, text="Received {}! Go get them!".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
+    try:
+        if text == "Begin":
+            bot.send_message(chat_id=update.message.chat_id, text="Received {}! Go get them!".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
-    if text == "Finish":
-        bot.send_message(chat_id=update.message.chat_id, text="Awesome! Time to chill!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
+        if text == "Finish":
+            bot.send_message(chat_id=update.message.chat_id, text="Awesome! Time to chill!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
-    if text == "My data!":
-        bot.send_message(chat_id=update.message.chat_id, text="<b>Stats for {}</b>".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
-        column_names, data = prepareCSV(chat_id)
-        send_file(bot, chat_id=update.message.chat_id, path="{}.csv".format(chat_id))
+        if text == "My data!":
+            bot.send_message(chat_id=update.message.chat_id, text="<b>Stats for {}</b>".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
+            column_names, data = prepareCSV(chat_id)
+            send_file(bot, chat_id=update.message.chat_id, path="{}.csv".format(chat_id))
+
+        except Exception as e:
+            if text != '':
+                send_message("Ups! I did not understand", reply_markup=reply_markup)
+            print(e)
         #bot.send_message(chat_id=update.message.chat_id, text="There it goes!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
     #bot.send_message(chat_id=update.message.chat_id, text=update.message.text, parse_mode=telegram.ParseMode.HTML)

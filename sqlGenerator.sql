@@ -13,7 +13,7 @@ COLLATE=latin1_swedish_ci;
 
 CREATE TABLE workcouBot.logs (
   id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-  creation_epoch INTEGER UNSIGNED NOT NULL,
+  creation_datetime DATETIME NOT NULL,
   log_text varchar(1200) NOT NULL,
   PRIMARY KEY ( id )
 )
