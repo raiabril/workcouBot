@@ -84,10 +84,7 @@ reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
 # ==========
 def start(bot, update):
     insertLog(str(update))
-    bot.send_message(chat_id=update.message.chat_id, text="Hi! I'm a Bot designed to help you control \
-    your working or studying hours. Keep track of the time you spend in the office by sending me Begin or Finish. \
-    You can download your data whenever you want by sending My data!.\
-    For more info /help", reply_markup=reply_markup)
+    bot.send_message(chat_id=update.message.chat_id, text="Hi! I'm a Bot designed to help you control your working or studying hours. Keep track of the time you spend in the office by sending me Begin or Finish. You can download your data whenever you want by sending My data!. For more info /help", reply_markup=reply_markup)
 
 def help(bot, update):
     insertLog(str(update))
@@ -116,22 +113,20 @@ def message_handler(bot, update):
 
     insertMessage(id, date, chat_id, username, text)
 
-    try:
-        if text == "Begin":
-            bot.send_message(chat_id=update.message.chat_id, text="Received {}! Go get them!".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
+    if text == "Begin":
+        bot.send_message(chat_id=update.message.chat_id, text="Received {}! Go get them!".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
-        if text == "Finish":
-            bot.send_message(chat_id=update.message.chat_id, text="Awesome! Time to chill!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
+    elif text == "Finish":
+        bot.send_message(chat_id=update.message.chat_id, text="Awesome! Time to chill!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
-        if text == "My data!":
-            bot.send_message(chat_id=update.message.chat_id, text="<b>Stats for {}</b>".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
-            column_names, data = prepareCSV(chat_id)
-            send_file(bot, chat_id=update.message.chat_id, path="{}.csv".format(chat_id))
+    elif text == "My data!":
+        bot.send_message(chat_id=update.message.chat_id, text="<b>Stats for {}</b>".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
+        column_names, data = prepareCSV(chat_id)
+        send_file(bot, chat_id=update.message.chat_id, path="{}.csv".format(chat_id))
 
-        except Exception as e:
-            if text != '':
-                send_message("Ups! I did not understand", reply_markup=reply_markup)
-            print(e)
+    else:
+        bot.send_message("Ups! I did not understand that.", reply_markup=reply_markup)
+
         #bot.send_message(chat_id=update.message.chat_id, text="There it goes!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
     #bot.send_message(chat_id=update.message.chat_id, text=update.message.text, parse_mode=telegram.ParseMode.HTML)
@@ -148,7 +143,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("help", unknown))
+    dp.add_handler(MessageHandler(Filters.command, unknown))
     dp.add_handler(MessageHandler(Filters.text, message_handler))
 
     # log all errors
