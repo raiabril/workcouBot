@@ -4,18 +4,16 @@ import time
 import urllib
 import os
 import random
-import yaml
 import mysql.connector
 
 SESSION_ID = random.randint(0,1000000)
-TOKEN = os.getenv('BOT_TOKEN',"Starting now!")
+TOKEN = os.getenv('BOT_TOKEN',"784190639:AAHJPD_XK9iLKFq-idZ6zT5Xacp19anVbJI")
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
-keyboard_wait = ["Starting now!","Out!"]
+keyboard_wait = ["Starting now!","Out!","My data!"]
 
 def getDB(query):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
     cursor = cnx.cursor()
-    query = ("SELECT * from messagesLog")
     cursor.execute(query)
     data = cursor.fetchall()
     names = cursor.column_names
@@ -26,7 +24,7 @@ def getDB(query):
 def setMessageDB(id, date, chat, username, text):
     cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
     cursor = cnx.cursor()
-    sql = "INSERT INTO messagesLog (id, date, chat_id, username, text) VALUES (%s, %s, %s, %s, %s)"
+    sql = "INSERT INTO messagesLog (id, creation_epoch, chat_id, username, message_text) VALUES (%s, %s, %s, %s, %s)"
     val = (id, date, chat, username, text)
     cursor.execute(sql, val)
     cnx.commit()
@@ -34,6 +32,16 @@ def setMessageDB(id, date, chat, username, text):
     cursor.close()
     cnx.close()
 
+def sendLogDB(date, update):
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cursor = cnx.cursor()
+    sql = "INSERT INTO logs (creation_epoch, log_text) VALUES (%s, %s)"
+    val = (date, update)
+    cursor.execute(sql, val)
+    cnx.commit()
+    print("log inserted")
+    cursor.close()
+    cnx.close()
 
 def get_url(url):
     response = requests.get(url)
@@ -65,15 +73,34 @@ def send_message(text, chat_id, reply_markup=None):
         url += "&reply_markup={}".format(reply_markup)
     get_url(url)
 
+def send_document(chat_id, path, reply_markup=None):
+    path = urllib.parse.quote_plus(path)
+    url = URL + "sendDocument?chat_id={}&document={}".format(chat_id, path)
+    if reply_markup:
+        url += "&reply_markup={}".format(reply_markup)
+    get_url(url)
+
+def send_messageHTML(text, chat_id, reply_markup=None):
+    url = URL + "sendMessage?text={}&chat_id={}&parse_mode=html".format(text, chat_id)
+    if reply_markup:
+        url += "&reply_markup={}".format(reply_markup)
+    get_url(url)
+
 def handle_updates(updates):
     for update in updates["result"]:
         try:
+            sendLogDB(time.time(), json.dumps(update))
+        except Exception as e:
+            print(e)
+
+        try:
             id = update["message"]["message_id"]
             text = update["message"]["text"]
-            chat = update["message"]["chat"]["id"]
+            chat_id = update["message"]["chat"]["id"]
             date = update["message"]["date"]
         except Exception as e:
             print(e)
+
         try:
             first_name = update["message"]["from"]["first_name"]
         except Exception as e:
@@ -91,26 +118,34 @@ def handle_updates(updates):
             username = "NULL"
 
         try:
+            if text == '/start':
+                keyboard = build_keyboard(keyboard_wait)
+                send_message("Hi! I'm a Bot designed to help you control your working or studying hours. Keep track of the time you spend in the office by sending me In! or Out!", chat_id,keyboard)
+
             if text == keyboard_wait[0]:
                 keyboard = build_keyboard(keyboard_wait)
-                send_message("Good morning {}! Go get them!".format(username), chat,keyboard)
+                send_message("Good morning {}! Go get them!".format(username), chat_id,keyboard)
 
             if text == keyboard_wait[1]:
                 keyboard = build_keyboard(keyboard_wait)
-                send_message("Great! Time to chill!", chat,keyboard)
+                send_message("Great! Time to chill!", chat_id,keyboard)
 
-            if text == '/start':
+            if text == keyboard_wait[2]:
                 keyboard = build_keyboard(keyboard_wait)
-                send_message("Hi! I'm a Bot designed to help you control your working or studying hours. Keep track of the time you spend in the office by sending me In! or Out!", chat,keyboard)
+                send_message("Let's see what we have here!", chat_id,keyboard)
+                query = ("SELECT FROM_UNIXTIME(creation_epoch) as creation_datetime,message_text FROM workcouBot.messagesLog WHERE chat_id = {}".format(chat_id))
+                columns, data = getDB(query)
+                send_document(chat_id,"http://www.mercasa.es/files/multimedios/1470593606_Cincuenta_anos_de_alimentacion_en_Espana.pdf")
 
         except Exception as e:
             if text != '':
                 keyboard = build_keyboard(keyboard_wait)
-                send_message("Ups! I did not understand", chat,keyboard)
+                send_message("Ups! I did not understand", chat_id,keyboard)
             print(e)
             print(text)
+
         try:
-            setMessageDB(id, date, chat, username, text)
+            setMessageDB(id, date, chat_id, username, text)
 
         except Exception as e:
             print(e)

@@ -14,3 +14,5 @@ sudo pip3 install pandas
 sudo pip3 install geopy
 sudo pip3 install python-telegram-bot --upgrade
 sudo apt-get install python3-yaml -y
+pip install mysql-connector
+pip install python-telegram-bot --upgrade
