@@ -84,11 +84,15 @@ reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
 # ==========
 def start(bot, update):
     insertLog(time.time(), str(update))
-    bot.send_message(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
+    bot.send_message(chat_id=update.message.chat_id, text="Hi! I'm a Bot designed to help you control \
+    your working or studying hours. Keep track of the time you spend in the office by sending me Begin or Finish. \
+    You can download your data whenever you want by sending My data!.\
+    For more info /help")
 
 def help(bot, update):
     insertLog(time.time(), str(update))
-    bot.send_message(chat_id=update.message.chat_id, text="this is help!")
+    bot.send_message(chat_id=update.message.chat_id,
+    text="This bot does not analyze or share your personal data.")
 
 def unknown(bot, update):
     insertLog(time.time(), str(update))

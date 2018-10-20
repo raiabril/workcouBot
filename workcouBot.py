@@ -7,12 +7,12 @@ import random
 import mysql.connector
 
 SESSION_ID = random.randint(0,1000000)
-TOKEN = os.getenv('BOT_TOKEN',"784190639:AAHJPD_XK9iLKFq-idZ6zT5Xacp19anVbJI")
+TOKEN = os.getenv('BOT_TOKEN',"")
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 keyboard_wait = ["Starting now!","Out!","My data!"]
 
 def getDB(query):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
     cursor = cnx.cursor()
     cursor.execute(query)
     data = cursor.fetchall()
@@ -22,7 +22,7 @@ def getDB(query):
     return names,data
 
 def setMessageDB(id, date, chat, username, text):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
     cursor = cnx.cursor()
     sql = "INSERT INTO messagesLog (id, creation_epoch, chat_id, username, message_text) VALUES (%s, %s, %s, %s, %s)"
     val = (id, date, chat, username, text)
@@ -33,7 +33,7 @@ def setMessageDB(id, date, chat, username, text):
     cnx.close()
 
 def sendLogDB(date, update):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
     cursor = cnx.cursor()
     sql = "INSERT INTO logs (creation_epoch, log_text) VALUES (%s, %s)"
     val = (date, update)
@@ -120,7 +120,7 @@ def handle_updates(updates):
         try:
             if text == '/start':
                 keyboard = build_keyboard(keyboard_wait)
-                send_message("Hi! I'm a Bot designed to help you control your working or studying hours. Keep track of the time you spend in the office by sending me In! or Out!", chat_id,keyboard)
+                send_message("Hi! I'm a Bot designed to help you control your working or studying hours. Keep track of the time you spend in the office by sending me Begin or Finish", chat_id,keyboard)
 
             if text == keyboard_wait[0]:
                 keyboard = build_keyboard(keyboard_wait)
