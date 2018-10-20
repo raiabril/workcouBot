@@ -17,7 +17,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 def insertLog(date, update):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
     cursor = cnx.cursor()
     sql = "INSERT INTO logs (creation_epoch, log_text) VALUES (%s, %s)"
     val = (date, update)
@@ -28,7 +28,7 @@ def insertLog(date, update):
     cnx.close()
 
 def insertMessage(id, date, chat_id, username, text):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
     cursor = cnx.cursor()
     sql = "INSERT INTO messagesLog (id, creation_datetime, chat_id, username, message_text) VALUES (%s, %s, %s, %s, %s)"
     val = (id, date, chat_id, username, text)
@@ -130,7 +130,7 @@ def message_handler(bot, update):
 
 def main():
     # Create the Updater and pass it your bot's token.
-    updater = Updater("784190639:AAHJPD_XK9iLKFq-idZ6zT5Xacp19anVbJI")
+    updater = Updater("")
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
