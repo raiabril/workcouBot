@@ -70,7 +70,7 @@ def request_location(bot,update):
     contact_keyboard = telegram.KeyboardButton(text="send_contact", request_contact=True)
     custom_keyboard = [[ location_keyboard, contact_keyboard ]]
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
-    bot.send_message(chat_id=chat_id, text="Would you mind sharing your location and contact with me?", reply_markup=reply_markup)
+    bot.send_message(chat_id=update.message.chat_id, text="Would you mind sharing your location and contact with me?", reply_markup=reply_markup)
 
 def send_image(bot, chat_id, path):
     bot.send_photo(chat_id=chat_id, photo=open(path, 'rb'))
