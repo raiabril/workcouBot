@@ -49,9 +49,9 @@ def runQuery(query):
     return names,data
 
 
-def prepareCSV(chat_id):
+def prepareCSV(chat_id,username):
     column_names, data = runQuery(query = ("SELECT creation_datetime,message_text FROM workcouBot.messagesLog WHERE chat_id = {}".format(chat_id)))
-    with open("{}.csv".format(chat_id), "w") as myfile:
+    with open("{}.csv".format(username), "w") as myfile:
         myfile.write("{},{}\n".format("Date", "Message"))
         for row in data:
             myfile.write("{},{}\n".format(row[0], row[1]))
@@ -121,11 +121,11 @@ def message_handler(bot, update):
 
     elif text == "My data!":
         bot.send_message(chat_id=update.message.chat_id, text="<b>Stats for {}</b>".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
-        column_names, data = prepareCSV(chat_id)
-        send_file(bot, chat_id=update.message.chat_id, path="{}.csv".format(chat_id))
+        column_names, data = prepareCSV(chat_id,username)
+        send_file(bot, chat_id=update.message.chat_id, path="{}.csv".format(username))
 
     else:
-        bot.send_message("Ups! I did not understand that.", reply_markup=reply_markup)
+        bot.send_message(chat_id=update.message.chat_id, text="Ups! I didn't get that!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
         #bot.send_message(chat_id=update.message.chat_id, text="There it goes!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
