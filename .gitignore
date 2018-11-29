@@ -103,3 +103,5 @@ venv.bak/
 # mypy
 .mypy_cache/
 dump-workcouBot-201811182040.sql
+
+*.csv
