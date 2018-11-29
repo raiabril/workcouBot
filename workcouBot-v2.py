@@ -107,7 +107,7 @@ def send_image(bot, chat_id, path):
 def send_file(bot, chat_id, path):
     bot.send_document(chat_id=chat_id, document=open(path, 'rb'))
 
-custom_keyboard = [["Begin","Finish", "My data!"]]
+custom_keyboard = [["Start","Stop", "My data!"]]
 reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
 
 begin_keyboard = [["/setup", "Exit"]]
@@ -174,14 +174,15 @@ def message_handler(bot, update):
     username= update.message.from_user.username
     insertMessage(update_id, update_date, chat_id, username, text)
 
-    if text == "Begin":
+    if text == "Start":
         bot.send_message(chat_id=update.message.chat_id, text="Received {}! Go get them!".format(username), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
-    elif text == "Finish":
+    elif text == "Stop":
         bot.send_message(chat_id=update.message.chat_id, text="Awesome! Time to chill!", parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
 
     elif text == "My data!":
         bot.send_message(chat_id=update.message.chat_id, text="<b>Stats for {}</b>".format(chat_id), parse_mode=telegram.ParseMode.HTML, reply_markup=reply_markup)
+        
         column_names, data = prepareCSV(chat_id,username)
         send_file(bot, chat_id=update.message.chat_id, path="{}.csv".format(chat_id))
 
