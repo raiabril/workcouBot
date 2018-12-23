@@ -1,3 +1,6 @@
+#!/usr/bin/env python3 
+#encoding utf-8
+
 import json
 import requests
 import time
@@ -12,6 +15,7 @@ from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram
+
 # This is a comment
 
 start_1 = "08:30"
@@ -31,11 +35,14 @@ break_finish_1 = "14:30"
 break_finish_2 = "15:00"
 break_finish_3 = "14:00"
 
+with open('app-key.json','r') as f:
+    keys = json.load(f)
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def insertLog(update):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd=keys["mysql_pass"], host='localhost')
     cursor = cnx.cursor()
     sql = "INSERT INTO logs (creation_datetime, log_text) VALUES (%s, %s)"
     val = (str(datetime.now()), update)
@@ -46,7 +53,7 @@ def insertLog(update):
     cnx.close()
 
 def insertMessage(update_id, update_date, chat_id, username, text):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd=keys["mysql_pass"], host='localhost')
     cursor = cnx.cursor()
     sql = "INSERT INTO messagesLog (id, creation_datetime, chat_id, username, message_text) VALUES (%s, %s, %s, %s, %s)"
     val = (update_id, update_date, chat_id, username, text)
@@ -57,7 +64,7 @@ def insertMessage(update_id, update_date, chat_id, username, text):
     cnx.close()
 
 def insertMode(update_id, chat_id, schedule_mode, start_time, stop_time, break_start_time, break_stop_time, update_date):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='J4v5f7o3', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd=keys["mysql_pass"], host='localhost')
     cursor = cnx.cursor()
     sql = "INSERT INTO userInfo (id, chat_id, schedule_mode, start_time, stop_time, break_start_time, break_stop_time, setup_datetime) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
     val = (update_id, chat_id, schedule_mode, start_time, stop_time, break_start_time, break_stop_time, update_date)
@@ -68,7 +75,7 @@ def insertMode(update_id, chat_id, schedule_mode, start_time, stop_time, break_s
     cnx.close()
 
 def runQuery(query):
-    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd='', host='localhost')
+    cnx = mysql.connector.connect(user='root', database='workcouBot', passwd=keys[mysql_pass], host='localhost')
     cursor = cnx.cursor()
     cursor.execute(query)
     data = cursor.fetchall()
@@ -86,9 +93,6 @@ def prepareCSV(chat_id,username):
             myfile.write("{},{}\n".format(row[0], row[1]))
     print("{} - Document prepared {}.csv".format(str(datetime.now()),chat_id))
     return column_names, data
-
-def prepareTable(data):
-
 
 def askQuestion(bot, update):
     keyboard = [[InlineKeyboardButton("Option 1", callback_data='1'),
@@ -227,7 +231,7 @@ def message_handler(bot, update):
 
 def main():
     # Create the Updater and pass it your bot's token.
-    updater = Updater("")
+    updater = Updater(keys["botToken"])
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
