@@ -87,6 +87,9 @@ def prepareCSV(chat_id,username):
     print("{} - Document prepared {}.csv".format(str(datetime.now()),chat_id))
     return column_names, data
 
+def prepareTable(data):
+
+
 def askQuestion(bot, update):
     keyboard = [[InlineKeyboardButton("Option 1", callback_data='1'),
                  InlineKeyboardButton("Option 2", callback_data='2')],
@@ -119,7 +122,11 @@ setup_markup = telegram.ReplyKeyboardMarkup(setup_keyboard)
 # ==========
 def start(bot, update):
     insertLog(str(update))
-    bot.send_message(chat_id=update.message.chat_id, text="Hi! I'm a Bot designed to help you control your working or studying hours. Keep track of the time you spend in the office by sending me Begin or Finish. You can download your data whenever you want by sending My data!. For more info /help. You can also configure your calendar with /setup. Thanks!!", reply_markup=begin_markup)
+    bot.send_message(chat_id=update.message.chat_id, 
+    text="Hi! I'm a Bot designed to help you control your working or studying hours. \
+    Keep track of the time you spend in the office by sending me Begin or Finish.\n\
+    You can download your data whenever you want by sending My data!. For more info /help. \n\
+    You can also configure your calendar with /setup. Thanks!!", reply_markup=begin_markup)
 
 def help(bot, update):
     insertLog(str(update))
